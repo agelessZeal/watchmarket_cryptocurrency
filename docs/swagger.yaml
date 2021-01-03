@@ -1,0 +1,443 @@
+definitions:
+  controllers.Coin:
+    properties:
+      Coin:
+        type: integer
+      token_id:
+        type: string
+      type:
+        type: string
+    type: object
+  controllers.RateResponse:
+    properties:
+      amount:
+        type: number
+    type: object
+  controllers.TickerPrice:
+    properties:
+      change_24h:
+        type: number
+      id:
+        type: string
+      price:
+        type: number
+      provider:
+        type: string
+    type: object
+  controllers.TickerRequest:
+    properties:
+      Currency:
+        type: string
+      assets:
+        items:
+          $ref: '#/definitions/controllers.Coin'
+        type: array
+    type: object
+  controllers.TickerRequestV2:
+    properties:
+      assets:
+        items:
+          type: string
+        type: array
+      currency:
+        type: string
+    type: object
+  controllers.TickerResponse:
+    properties:
+      currency:
+        type: string
+      docs:
+        $ref: '#/definitions/watchmarket.Tickers'
+        type: object
+    type: object
+  controllers.TickerResponseV2:
+    properties:
+      currency:
+        type: string
+      tickers:
+        items:
+          $ref: '#/definitions/controllers.TickerPrice'
+        type: array
+    type: object
+  watchmarket.Chart:
+    properties:
+      error:
+        type: string
+      prices:
+        items:
+          $ref: '#/definitions/watchmarket.ChartPrice'
+        type: array
+      provider:
+        type: string
+    type: object
+  watchmarket.ChartPrice:
+    properties:
+      date:
+        type: integer
+      price:
+        type: number
+    type: object
+  watchmarket.CoinDetails:
+    properties:
+      circulating_supply:
+        type: number
+      info:
+        $ref: '#/definitions/watchmarket.Info'
+        type: object
+      market_cap:
+        type: number
+      provider:
+        type: string
+      provider_url:
+        type: string
+      total_supply:
+        type: number
+      volume_24:
+        type: number
+    type: object
+  watchmarket.Info:
+    properties:
+      description:
+        type: string
+      explorer:
+        type: string
+      name:
+        type: string
+      research:
+        type: string
+      short_description:
+        type: string
+      socials:
+        items:
+          $ref: '#/definitions/watchmarket.SocialLink'
+        type: array
+      source_code:
+        type: string
+      website:
+        type: string
+      white_paper:
+        type: string
+    type: object
+  watchmarket.Price:
+    properties:
+      change_24h:
+        type: number
+      currency:
+        type: string
+      provider:
+        type: string
+      value:
+        type: number
+    type: object
+  watchmarket.SocialLink:
+    properties:
+      handle:
+        type: string
+      name:
+        type: string
+      url:
+        type: string
+    type: object
+  watchmarket.Ticker:
+    properties:
+      coin:
+        type: integer
+      coin_name:
+        type: string
+      error:
+        type: string
+      last_update:
+        type: string
+      market_cap:
+        type: number
+      price:
+        $ref: '#/definitions/watchmarket.Price'
+        type: object
+      token_id:
+        type: string
+      type:
+        type: string
+      volume:
+        type: number
+    type: object
+  watchmarket.Tickers:
+    items:
+      $ref: '#/definitions/watchmarket.Ticker'
+    type: array
+info:
+  contact: {}
+  license: {}
+paths:
+  /v1/market/charts:
+    get:
+      consumes:
+      - application/json
+      description: Get the charts data from an market and coin/token
+      operationId: get_charts_data
+      parameters:
+      - default: 60
+        description: Coin id
+        in: query
+        name: coin
+        required: true
+        type: integer
+      - description: Token id
+        in: query
+        name: token
+        type: string
+      - default: 1574483028
+        description: Start timestamp
+        in: query
+        name: time_start
+        type: integer
+      - default: 64
+        description: Max number of items in result prices array
+        in: query
+        name: max_items
+        type: integer
+      - default: USD
+        description: The currency to show charts
+        in: query
+        name: currency
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/watchmarket.Chart'
+      summary: Get charts data for a specific coin
+      tags:
+      - Charts
+  /v1/market/info:
+    get:
+      consumes:
+      - application/json
+      description: Get the charts coin assets data from an market and coin/contract
+      operationId: get_charts_coin_info
+      parameters:
+      - default: "60"
+        description: Coin id
+        in: query
+        name: coin
+        required: true
+        type: string
+      - description: Token id
+        in: query
+        name: token
+        type: string
+      - default: USD
+        description: The currency to show coin assets in
+        in: query
+        name: currency
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/watchmarket.CoinDetails'
+      summary: Get charts coin assets data for a specific coin
+      tags:
+      - Info
+  /v1/market/rate:
+    get:
+      consumes:
+      - application/json
+      description: Get rate
+      operationId: get_rate
+      parameters:
+      - default: USD
+        description: From
+        in: query
+        name: from
+        type: string
+      - default: RUB
+        description: To
+        in: query
+        name: to
+        type: string
+      - default: "100"
+        description: Amount
+        in: query
+        name: amount
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/controllers.RateResponse'
+      summary: Get rate
+      tags:
+      - Rates
+  /v1/market/ticker:
+    post:
+      consumes:
+      - application/json
+      description: Get the ticker values from many market and coin/token
+      operationId: get_tickers
+      parameters:
+      - description: Ticker
+        in: body
+        name: tickers
+        required: true
+        schema:
+          $ref: '#/definitions/controllers.TickerRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/controllers.TickerResponse'
+      summary: Get ticker values for a specific market
+      tags:
+      - Tickers
+  /v2/market/charts/{id}:
+    get:
+      consumes:
+      - application/json
+      description: Get the charts data from an market and coin/token
+      operationId: get_charts_data_v2
+      parameters:
+      - default: c60
+        description: id
+        in: path
+        name: id
+        required: true
+        type: string
+      - default: 1574483028
+        description: Start timestamp
+        in: query
+        name: time_start
+        type: integer
+      - default: 64
+        description: Max number of items in result prices array
+        in: query
+        name: max_items
+        type: integer
+      - default: USD
+        description: The currency to show charts
+        in: query
+        name: currency
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/watchmarket.Chart'
+      summary: Get charts data for a specific id
+      tags:
+      - Charts
+  /v2/market/info/{id}:
+    get:
+      consumes:
+      - application/json
+      description: Get the charts coin assets data from an market and coin/contract
+      operationId: get_charts_coin_info_v2
+      parameters:
+      - default: c714
+        description: id
+        in: path
+        name: id
+        required: true
+        type: string
+      - default: USD
+        description: The currency to show coin assets in
+        in: query
+        name: currency
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/watchmarket.CoinDetails'
+      summary: Get charts coin assets data for a specific coin
+      tags:
+      - Info
+  /v2/market/ticker/{id}:
+    get:
+      consumes:
+      - application/json
+      description: Get the ticker for specific id
+      operationId: get_ticker
+      parameters:
+      - default: c714_tXRP-BF2
+        description: id
+        in: path
+        name: id
+        required: true
+        type: string
+      - default: USD
+        description: The currency to show coin assets in
+        in: query
+        name: currency
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/controllers.TickerResponseV2'
+      summary: Get ticker for a specific market
+      tags:
+      - Tickers
+  /v2/market/tickers:
+    post:
+      consumes:
+      - application/json
+      description: Get the tickers for list of ids
+      operationId: post_tickers_v2
+      parameters:
+      - description: Ticker
+        in: body
+        name: tickers
+        required: true
+        schema:
+          $ref: '#/definitions/controllers.TickerRequestV2'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/controllers.TickerResponseV2'
+      summary: Get tickers for list of ids
+      tags:
+      - Tickers
+  /v2/market/tickers/{assets}:
+    get:
+      consumes:
+      - application/json
+      description: Get the tickers for list of ids
+      operationId: get_tickers_v2
+      parameters:
+      - description: List of asset ids
+        in: path
+        name: assets
+        required: true
+        type: string
+      - description: Currency symbol
+        in: query
+        name: currency
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/controllers.TickerResponseV2'
+      summary: Get tickers for list of ids
+      tags:
+      - Tickers
+swagger: "2.0"
