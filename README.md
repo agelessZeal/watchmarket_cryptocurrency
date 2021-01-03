@@ -1,5 +1,4 @@
 # watchmarket_cyrptocurrency
-# Watchmarket
 
 ![CI](https://github.com/trustwallet/watchmarket/workflows/CI/badge.svg)
 [![codecov](https://codecov.io/gh/trustwallet/watchmarket/branch/master/graph/badge.svg)](https://codecov.io/gh/trustwallet/watchmarket)
